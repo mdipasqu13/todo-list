@@ -2,18 +2,20 @@ import os
 import json
 
 TASKS_FILE = 'tasks.json'
+COMPLETED_TASKS_FILE = 'completed_tasks.json'
 
-def loadTasks():
-    if os.path.exists(TASKS_FILE):
-        with open(TASKS_FILE, 'r') as file:
+def loadTasks(filename):
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
             return json.load(file)
     return []
 
-def saveTasks():
-    with open(TASKS_FILE, 'w') as file:
+def saveTasks(filename, tasks):
+    with open(filename, 'w') as file:
         json.dump(tasks, file)
 
-tasks = loadTasks()
+tasks = loadTasks(TASKS_FILE)
+completed_tasks = loadTasks(COMPLETED_TASKS_FILE)
 
 def addTask():
     task = input("Enter task (or type 'cancel' to go back): ").strip()
@@ -21,10 +23,9 @@ def addTask():
         print("Add task operation cancelled.")
         return
     tasks.append(task)
-    saveTasks()  
+    saveTasks(TASKS_FILE, tasks)
     os.system("clear")
     print(f"Task '{task}' added to the list!")
-
 
 def listTasks():
     os.system("clear")
@@ -35,6 +36,15 @@ def listTasks():
         for index, task in enumerate(tasks, start=1):
             print(f"Task #{index}. {task}")
 
+def listCompletedTasks():
+    os.system("clear")
+    if not completed_tasks:
+        print("There are no completed tasks currently.")
+    else:
+        print("Completed Tasks:")
+        for index, task in enumerate(completed_tasks, start=1):
+            print(f"Completed Task #{index}. {task}")
+
 def deleteTask():
     listTasks()
     taskToDelete = input("Enter the # to delete (or type 'cancel' to go back): ").strip()
@@ -43,28 +53,39 @@ def deleteTask():
         print("Delete task operation cancelled.")
         return
     try:
-        taskToDelete = int(taskToDelete) - 1  
+        taskToDelete = int(taskToDelete) - 1
         if 0 <= taskToDelete < len(tasks):
             deleted_task = tasks.pop(taskToDelete)
-            saveTasks()
+            saveTasks(TASKS_FILE, tasks)
             os.system("clear")
             print(f"Task '{deleted_task}' deleted successfully.")
         else:
-            print(f"Task #{taskToDelete + 1} was not found.")  
+            print(f"Task #{taskToDelete + 1} was not found.")
     except ValueError:
         os.system("clear")
         print("Invalid input.")
-        
-def deleteAllTasks():
-    global tasks
-    confirm = input("Are you sure you want to delete all tasks? (yes/no): ").strip().lower()
-    if confirm == 'yes':
-        tasks.clear()
-        saveTasks() 
+
+def completeTask():
+    listTasks()
+    taskToComplete = input("Enter the # of the task to mark as completed (or type 'cancel' to go back): ").strip()
+    if taskToComplete.lower() == 'cancel':
         os.system("clear")
-        print("All tasks have been deleted.")
-    else:
-        print("Operation cancelled.")
+        print("Complete task operation cancelled.")
+        return
+    try:
+        taskToComplete = int(taskToComplete) - 1
+        if 0 <= taskToComplete < len(tasks):
+            completed_task = tasks.pop(taskToComplete)
+            completed_tasks.append(completed_task)
+            saveTasks(TASKS_FILE, tasks)
+            saveTasks(COMPLETED_TASKS_FILE, completed_tasks)
+            os.system("clear")
+            print(f"Task '{completed_task}' marked as completed and moved to completed tasks list.")
+        else:
+            print(f"Task #{taskToComplete + 1} was not found.")
+    except ValueError:
+        os.system("clear")
+        print("Invalid input.")
 
 if __name__ == "__main__":
     os.system("clear")
@@ -77,8 +98,9 @@ if __name__ == "__main__":
         print("1. Add Task")
         print("2. Delete Task")
         print("3. List Tasks")
-        print("4. Delete All Tasks")
-        print("5. Exit")
+        print("4. Complete Task")  
+        print("5. List Completed Tasks")  # New option for listing completed tasks
+        print("6. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -93,10 +115,14 @@ if __name__ == "__main__":
             listTasks()
         elif choice == "4":
             os.system("clear")
-            deleteAllTasks()
-        elif choice == "5":
+            completeTask()
+        elif choice == "5":  # Handle the new option
+            os.system("clear")
+            listCompletedTasks()
+        elif choice == "6":
             break
         else:
             print("Invalid choice. Please try again.")
+
     os.system("clear")
     print("Goodbye!")
