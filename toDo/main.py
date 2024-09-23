@@ -89,7 +89,7 @@ def completeTask():
 
 if __name__ == "__main__":
     os.system("clear")
-    print("Welcome to the To-Do List App!")
+    print("Welcome Michael!")
     
     while True:
         print("\n")
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         print("2. Delete Task")
         print("3. List Tasks")
         print("4. Complete Task")  
-        print("5. List Completed Tasks")  # New option for listing completed tasks
+        print("5. List Completed Tasks") 
         print("6. Exit")
 
         choice = input("Enter your choice: ")
@@ -116,7 +116,7 @@ if __name__ == "__main__":
         elif choice == "4":
             os.system("clear")
             completeTask()
-        elif choice == "5":  # Handle the new option
+        elif choice == "5":  
             os.system("clear")
             listCompletedTasks()
         elif choice == "6":
